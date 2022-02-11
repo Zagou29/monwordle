@@ -217,14 +217,18 @@ function checkWinLose(guess, tiles) {
   if (guess === targetWord) {
     showAlert("Bravo!", 5000);
     danceTiles(tiles);
-    stopInteraction();
+    setTimeout(() => {
+      window.location.reload();
+    },5000);
     return;
   }
 
   const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
   if (remainingTiles.length === 0) {
     showAlert("Désolé.. C'était " + targetWord.toUpperCase() + " !", null);
-    stopInteraction();
+    setTimeout(() => {
+      window.location.reload();
+    },5000);
   }
 }
 
