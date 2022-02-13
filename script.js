@@ -177,7 +177,8 @@ function flipTile(tile, index, array, guess, activeTiles) {
             resultat.target = targetWord;
             resultat.langue = lang;
             let dateJeuxLast = "";
-            if (jeux!==[]) {
+            if (jeux.length>0) {
+              console.log(jeux)
               dateJeuxLast = jeux[jeux.length - 1].date;
             }
             if (resultat.date == dateJeuxLast) {
@@ -242,7 +243,7 @@ function checkWinLose(guess, tiles) {
 
   const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
   if (remainingTiles.length === 0) {
-    showAlert("Désolé.. C'était " + targetWord.toUpperCase() + " !","erreur", null,);
+    showAlert("Désolé.. C'était " + targetWord.toUpperCase() + " !","erreur", null);
     resultat.reussi = false;
     jeux.push(resultat);
     localStorage.setItem("jeux", JSON.stringify(jeux));
