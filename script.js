@@ -7,18 +7,37 @@ const keyboard = document.querySelector("[data-keyboard]");
 const alertContainer = document.querySelector("[data-alert-container]");
 const guessGrid = document.querySelector("[data-guess-grid]");
 const langue = document.querySelector("#lang");
-
-let lang = "F";
+/* gestion de la date du jour */
+let dateA = new Date();
+const dateAujourdhui = () => {
+  return `${dateA.getDate()}/${dateA.getMonth() + 1}/${dateA.getFullYear()}`;
+};
+const resultat = {
+  date: dateAujourdhui(),
+  numero: 0,
+  langue: "",
+  essais: [],
+  target: "",
+  reussi: false,
+};
+/* recuperer les archives  si elles existent, sinon []*/
+let jeux = JSON.parse(localStorage.getItem("jeux"));
+if (!jeux) {
+  jeux = [];
+}
+/* recuperer la langue */
+let lang = JSON.parse(localStorage.getItem("langue"));
+if (!lang) lang = "F";
+langue.value = lang;
 let targetWord = dico(lang);
 localStorage.setItem("[targets]", targetWord);
+/* si on change la langue, on la stocke dans LocalStorage pour la retrouver apres reload */
 langue.addEventListener("change", () => {
-  effGrid();
   lang = langue.value;
-  targetWord = dico(lang);
-  localStorage.setItem("[targets]", targetWord);
+  localStorage.setItem("langue", JSON.stringify(lang));
+  window.location.reload();
 });
 
-/* cherche le mot au hasard dans le dico */
 
 startInteraction();
 
@@ -88,7 +107,7 @@ function submitGuess() {
   const activeTiles = [...getActiveTiles()];
 
   if (activeTiles.length !== WORD_LENGTH) {
-    showAlert("Manque des lettres");
+    showAlert(`${activeTiles.length} lettres ?`,"erreur",1000);
     shakeTiles(activeTiles);
     return;
   }
@@ -97,7 +116,7 @@ function submitGuess() {
     return word + tile.dataset.letter;
   }, "");
   if (!motExist(guess, lang)) {
-    showAlert("Pas dans le dictionnaire");
+    showAlert("Mot inconnu !","erreur",1000 );
     shakeTiles(activeTiles);
     return;
   }
@@ -154,6 +173,17 @@ function flipTile(tile, index, array, guess, activeTiles) {
           "transitionend",
           () => {
             startInteraction();
+            resultat.essais.push(guess);
+            resultat.target = targetWord;
+            resultat.langue = lang;
+            let dateJeuxLast = "";
+            if (jeux!==[]) {
+              dateJeuxLast = jeux[jeux.length - 1].date;
+            }
+            if (resultat.date == dateJeuxLast) {
+              resultat.numero = jeux[jeux.length - 1].numero + 1;
+            }
+            console.log(resultat);
             checkWinLose(guess, array);
           },
           { once: true }
@@ -168,35 +198,20 @@ const getActiveTiles = () => {
   return guessGrid.querySelectorAll('[data-state="active"]');
 };
 
-function removeClassTouche(classe) {
-  keyboard.querySelectorAll(`.${classe}`).forEach((touche) => {
-    touche.classList.remove(classe);
-  });
-}
 
-const effGrid = () => {
-  guessGrid.querySelectorAll("[data-state]").forEach((key) => {
-    delete key.dataset.letter;
-    delete key.dataset.state;
-    key.textContent = "";
-  });
-  removeClassTouche("faux");
-  removeClassTouche("pas-la");
-  removeClassTouche("correct");
-};
-
-function showAlert(message, duration = 1000) {
+function showAlert(message, why, duration = 1000) {
   const alert = document.createElement("div");
   alert.textContent = message;
   alert.classList.add("alert");
-  alertContainer.prepend(alert);
+  alert.classList.add(why)
+  alertContainer.append(alert);/* au lien de prepend */
   if (duration == null) return;
 
   setTimeout(() => {
     alert.classList.add("hide");
     alert.addEventListener("transitionend", () => {
       alert.remove();
-    });
+    },{once:true});
   }, duration);
 }
 
@@ -215,20 +230,23 @@ function shakeTiles(tiles) {
 
 function checkWinLose(guess, tiles) {
   if (guess === targetWord) {
-    showAlert("Bravo!", 5000);
+    showAlert("Bravo!","bravo", 5000);
     danceTiles(tiles);
-    setTimeout(() => {
-      window.location.reload();
-    },5000);
+    console.log(resultat);
+    resultat.reussi = true;
+    jeux.push(resultat);
+    localStorage.setItem("jeux", JSON.stringify(jeux));
+    stopInteraction()
     return;
   }
 
   const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
   if (remainingTiles.length === 0) {
-    showAlert("Désolé.. C'était " + targetWord.toUpperCase() + " !", null);
-    setTimeout(() => {
-      window.location.reload();
-    },5000);
+    showAlert("Désolé.. C'était " + targetWord.toUpperCase() + " !","erreur", null,);
+    resultat.reussi = false;
+    jeux.push(resultat);
+    localStorage.setItem("jeux", JSON.stringify(jeux));
+    stopInteraction()
   }
 }
 
