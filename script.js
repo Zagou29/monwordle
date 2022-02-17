@@ -171,19 +171,7 @@ function flipTile(tile, index, array, guess, activeTiles) {
         key.classList.add("faux");
       }
       if (index === array.length - 1) {
-        /* reconstruire targword sans les lettres correctes */
-        // activeTiles.forEach((tile, index) => {
-        //   if (tile.dataset.state === "correct") return;
-        //   targmod = targmod + targetWord[index];
-        // });
-        const reduitTarg = (letJaune, tableau) => {
-          tableau.filter((lettre) => {
-            if (tableau.includes(letJaune)) return;
-            return lettre;
-          });
-
-          return targmod;
-        };
+       
         const targmod = Array.from(targetWord).filter((lettre, index) => {
           if (activeTiles[index].dataset.state === "correct") return;
           return lettre;
