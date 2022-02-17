@@ -7,8 +7,7 @@ const keyboard = document.querySelector("[data-keyboard]");
 const alertContainer = document.querySelector("[data-alert-container]");
 const guessGrid = document.querySelector("[data-guess-grid]");
 const langue = document.querySelector("#lang");
-const hard =document.querySelector("#hardmode");
-console.dir(hard)
+const hard = document.querySelector("#hardmode");
 /* gestion de la date du jour */
 let dateA = new Date();
 const dateAujourdhui = () => {
@@ -40,10 +39,10 @@ langue.addEventListener("change", () => {
   localStorage.setItem("langue", JSON.stringify(lang));
   window.location.reload();
 });
-let hardm= hard.value;
-hard.addEventListener("change",()=>{
-  hardm=hard.value
-})
+let hardm = hard.value;
+hard.addEventListener("change", () => {
+  hardm = hard.value;
+});
 startInteraction();
 /* ---------------- fonctions---------------- */
 function startInteraction() {
@@ -135,12 +134,11 @@ function submitGuess() {
     shakeTiles(activeTiles);
     return;
   }
-  console.log(hardm)
 
-  if(manqueLettres(guess)&&(hardm==="h")) {
-    showAlert("manque lettres", "erreur",1000)
+  if (manqueLettres(guess) && hardm === "h") {
+    showAlert("manque lettres", "erreur", 1000);
     shakeTiles(activeTiles);
-    return
+    return;
   }
   stopInteraction();
 
@@ -173,11 +171,22 @@ function flipTile(tile, index, array, guess, activeTiles) {
         key.classList.add("faux");
       }
       if (index === array.length - 1) {
-        let targmod = "";
         /* reconstruire targword sans les lettres correctes */
-        activeTiles.forEach((tile, index) => {
-          if (tile.dataset.state === "correct") return;
-          targmod = targmod + targetWord[index];
+        // activeTiles.forEach((tile, index) => {
+        //   if (tile.dataset.state === "correct") return;
+        //   targmod = targmod + targetWord[index];
+        // });
+        const reduitTarg = (letJaune, tableau) => {
+          tableau.filter((lettre) => {
+            if (tableau.includes(letJaune)) return;
+            return lettre;
+          });
+
+          return targmod;
+        };
+        const targmod = Array.from(targetWord).filter((lettre, index) => {
+          if (activeTiles[index].dataset.state === "correct") return;
+          return lettre;
         });
         /* enlever les lettres correctes de activeTiles */
         const actRed = activeTiles.filter((tile) => {
@@ -187,6 +196,7 @@ function flipTile(tile, index, array, guess, activeTiles) {
         actRed.forEach((tile) => {
           if (targmod.includes(tile.dataset.letter)) {
             tile.dataset.state = "pas-la";
+            targmod.splice(targmod.indexOf(tile.dataset.letter), 1);
           } else {
             tile.dataset.state = "faux";
           }
@@ -201,7 +211,6 @@ function flipTile(tile, index, array, guess, activeTiles) {
             resultat.langue = lang;
             let dateJeuxLast = "";
             if (jeux.length > 0) {
-              console.log(jeux);
               dateJeuxLast = jeux[jeux.length - 1].date;
             }
             if (resultat.date == dateJeuxLast) {
@@ -259,7 +268,6 @@ function checkWinLose(guess, tiles) {
   if (guess === targetWord) {
     showAlert("Bravo!", "bravo", 5000);
     danceTiles(tiles);
-    console.log(resultat);
     resultat.reussi = true;
     jeux.push(resultat);
     localStorage.setItem("jeux", JSON.stringify(jeux));
