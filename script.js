@@ -106,9 +106,11 @@ function deleteKey() {
   delete lastTile.dataset.state; /* supprime les 2 dataset */
   delete lastTile.dataset.letter;
 }
+/* rejoute la lettre si pas dejà dans l'array */
 function rajoutLettre(lettre) {
   if (!lettresOK.find((l) => l === lettre)) lettresOK.push(lettre);
 }
+/* renvoie vrai si des lettres dejà trouvées manquent */
 function manqueLettres(guess) {
   let renvoi = false;
   lettresOK.forEach((ll) => {
@@ -134,14 +136,16 @@ function submitGuess() {
     shakeTiles(activeTiles);
     return;
   }
-
   if (manqueLettres(guess) && hardm === "h") {
-    showAlert("manque lettres", "erreur", 1000);
+    showAlert(
+      `manque ${lettresOK.filter((l) => !Array.from(guess).includes(l))}`,
+      "erreur",
+      3000
+    );
     shakeTiles(activeTiles);
     return;
   }
   stopInteraction();
-
   activeTiles.forEach((...params) => flipTile(...params, guess, activeTiles));
 }
 
@@ -171,16 +175,16 @@ function flipTile(tile, index, array, guess, activeTiles) {
         key.classList.add("faux");
       }
       if (index === array.length - 1) {
-       
+        /* enlever les lettres correctes de activeTiles */
         const targmod = Array.from(targetWord).filter((lettre, index) => {
           if (activeTiles[index].dataset.state === "correct") return;
           return lettre;
         });
-        /* enlever les lettres correctes de activeTiles */
+        /* enlever les lettre correctes du mot a trouver */
         const actRed = activeTiles.filter((tile) => {
           return tile.dataset.state !== "correct";
         });
-        /* maj du statut des lettres restantes */
+        /* si lettre existe mais mal placée, reste en jaune, mais enlevée du mot à trouver , sinon passe en noir*/
         actRed.forEach((tile) => {
           if (targmod.includes(tile.dataset.letter)) {
             tile.dataset.state = "pas-la";
@@ -262,7 +266,6 @@ function checkWinLose(guess, tiles) {
     stopInteraction();
     return;
   }
-
   const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
   if (remainingTiles.length === 0) {
     showAlert(
