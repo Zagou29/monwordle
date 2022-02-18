@@ -137,6 +137,7 @@ function submitGuess() {
     return;
   }
   if (manqueLettres(guess) && hardm === "h") {
+    /* cherche les lettresOK qui ne sont pas dans Guess */
     showAlert(
       `manque ${lettresOK.filter((l) => !Array.from(guess).includes(l))}`,
       "erreur",
