@@ -92,11 +92,12 @@ body {
 
 .key:hover,
 .key:focus {
-  --lightness-offset: 10%;
+  --lightness-offset: 20%;
 }
 /* Dans ce sens pour confirmer l' appartenance au mot*/
 .key.faux {
-  --lightness: 23%;
+  --lightness: 03%;
+  color: hsl(200,1%, calc(var(--lightness-offset,0%) + 50%))
 }
 
 .key.pas-la {

@@ -39,10 +39,12 @@ langue.addEventListener("change", () => {
   localStorage.setItem("langue", JSON.stringify(lang));
   window.location.reload();
 });
+/* ecoute le changement de mode dur<->crool */
 let hardm = hard.value;
 hard.addEventListener("change", () => {
   hardm = hard.value;
 });
+/*  c'est parti!!   */
 startInteraction();
 /* ---------------- fonctions---------------- */
 function startInteraction() {
