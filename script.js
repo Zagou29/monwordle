@@ -58,6 +58,7 @@ function stopInteraction() {
 }
 
 function handleMouseClick(e) {
+  console.log(e.target)
   if (e.target.matches("[data-key]")) {
     pressKey(e.target.dataset.key);
     return;
@@ -68,7 +69,7 @@ function handleMouseClick(e) {
     return;
   }
 
-  if (e.target.matches("[data-delete]")) {
+  if (e.target.matches("[data-delete]")||e.target.matches("svg")||e.target.matches("path")) {
     deleteKey(e);
     return;
   }
